@@ -1,0 +1,91 @@
+
+——————————————————————————————————————————————————————————————————————————————————————————————————————
+一、静态分配：
+typedef struct{
+    ElemType data[MaxSize];---------------------------------静态数组存放数据元素
+    int length;---------------------------------------------顺序表的当前存入数据的长度
+} SqList;---------------------------------------------------顺序表的类型定义
+
+--初始化顺序表(静态)--
+【SqList L】
+void InitList(SqList &L){
+    for(int i = 0; i < MaxSize; i++)
+        L.data[i] = 0;--------------------------------------不够友好，因为表长不一定是MaxSize大小
+    L.length = 0;-------------------------------------------初始表长为0
+}
+
+———————————————————————————————————————————————————————————————————————————————————————————————————————
+
+二、动态分配：
+#define InitSize 10-----------------------------------------顺序表的初始长度
+typedef struct{
+    ElemType *data;-----------------------------------------指示动态分配数组的指针
+    int MaxSize;--------------------------------------------顺序表的最大容量
+    int length;---------------------------------------------顺序表当前存入数据的长度
+} SeqList;--------------------------------------------------顺序表的类型定义
+
+//【SeqList L】
+//L.data = (ElemType *)malloc(sizeof(ElemType) * IniteSize);
+
+--初始化顺序表(动态)--
+void InitList(SeqList &L){
+    L.data = (ElemType *)malloc(sizeof(ElemType) * IniteSize);
+    L.length = 0;
+    L.MaxSize = InitSize;
+}
+
+--增加动态数组的长度--
+void IncreaseSize(SeqList &L, int len){
+    int *p = L.data;----------------------------------------相当于复制了一个动态数组
+    L.data = (ElemType *)malloc(sizeof(ElemType) * (L.MaxSize = len));//新的动态数组大小
+    for(int i = 0; i < L.length; i++)
+        L.data[i] = p[i];-----------------------------------将数据复制到新区域
+    L.MaxSize = L.MaxSize + len;//更新数组最大容量
+    free(p);------------------------------------------------释放原来的空间
+}
+
+——————————————————————————————————————————————————————————————————————————————————————————————————————
+=======顺序表的基本操作======
+
+--插入---------------------在L的i处插入e
+bool ListInsert(SqList &L. int i, int e){
+    //i应该在[1,length+1]内
+    //数组已经满了，也不能继续操作
+    if(i < 1 || i > L.length+1)
+        return false;
+    if(L.length >= MaxSize)
+        return false;
+    //两个判断-----代码的健壮性
+    for(int j = L.length; j >= i; j--)
+        L.data[j] = L.data[j-1];
+    L.data[i-1] = e;
+    L.length++;
+    return true;
+}
+
+--删除---------------------删除L的i处的值并将值返回e
+bool ListDelet(SqList &L, int i, int &e){
+    if(i < 1 || i > L.length+1)
+        return false;
+    e = L.data[i-1];//返回e
+    for(int j = i; j < L.length; j++)
+        L.data[j-1] = L.data[j];//删除后前移
+        L.length--;
+        return true;
+}
+
+--按位查找------------------获取L第i个元素
+int GetElem(SqList L, int i){
+    //可判断i值是否合法
+    return L.data[i-1];
+}
+
+--按值查找-----------------获取值为e的位置
+int LocateElem(SqList L, ElemType e){
+    for(int i = 0; i < L.length; i++){
+        if(L.data[i] == e)
+            return i+1;//返回其位序
+    }
+    return 0;
+}
+
